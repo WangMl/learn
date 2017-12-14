@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ControlPanel from './views/ControlPanel';
 
-import Provider from './Provider';
+import {Provider} from 'react-redux';
 import store from './Store';
 
 ReactDOM.render(

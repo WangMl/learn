@@ -1,17 +1,16 @@
 import React,{Component,PropTypes} from 'react';
 import * as Actions from '../Actions.js';
+import {connect} from 'react-redux';
 
-class Counter extends Component{
-    render(){
-        const {caption,onIncrement,onDecrement,value} = this.props;
-        return (
-            <div>
-                <button onClick={onIncrement}>+</button>
-                <button onClick={onDecrement}>-</button>
-                <span>{caption} count : {value}</span>
-            </div>
-        ); 
-    }
+function Counter(props){
+    let {caption,onIncrement,onDecrement,value} = props;
+    return(
+        <div>
+            <button onClick={onIncrement}>+</button>
+            <button onClick={onDecrement}>-</button>
+            <span>{caption} count : {value}</span>
+        </div>
+    );
 }
 
 Counter.propTypes = {
@@ -21,65 +20,21 @@ Counter.propTypes = {
     value: PropTypes.number.isRequired
 };
 
-class CounterContainer extends Component{
-    constructor(props,context){
-        super(props,context);
-        this.onIncrement = this.onIncrement.bind(this);
-        this.onDecrement = this.onDecrement.bind(this);
-        this.onChange = this.onChange.bind(this);
-        this.getOwnState = this.getOwnState.bind(this);
-
-        this.state = this.getOwnState();
-    }
-
-    getOwnState(){
-       return {
-           value: this.context.store.getState()[this.props.caption]
-       }
-    }
-
-    onIncrement(){
-        this.context.store.dispatch(Actions.increment(this.props.caption));
-    }
-
-    onDecrement(){
-        this.context.store.dispatch(Actions.decrement(this.props.caption));
-    }
-
-    onChange(){
-        this.setState(this.getOwnState());
-    }
-    
-    componentDidMount(){
-        this.context.store.subscribe(this.onChange);
-    }
-
-    componentWillUnmount(){
-        this.context.store.unsubscribe(this.onChange);
-    }
-
-    shouldComponentUpdate(nextProps,nextState){
-       return (nextProps.caption !== this.props.caption || 
-               nextState.value !== this.state.value);
-    }
-    render(){
-        return (
-            <Counter caption={this.props.caption}
-               onIncrement={this.onIncrement}
-               onDecrement={this.onDecrement}
-               value={this.state.value}
-            />
-        );
+function mapStateToProps(state,ownProps){
+    return {
+        value: state[ownProps.caption]
     }
 }
 
-CounterContainer.propTypes={
-    caption:PropTypes.string.isRequired
+function mapDispathToProps(dispatch,ownProps){
+    return {
+        onIncrement:()=>{
+            dispatch(Actions.increment(ownProps.caption));
+        },
+        onDecrement:()=>{
+            dispatch(Actions.decrement(ownProps.caption));
+        }
+    }
 }
 
-CounterContainer.contextTypes={
-    store: PropTypes.object
-}
-export default CounterContainer;
-
-
+export default connect(mapStateToProps,mapDispathToProps)(Counter);
